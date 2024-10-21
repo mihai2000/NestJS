@@ -2,12 +2,14 @@ import { BadRequestException, forwardRef, HttpException, HttpStatus, Inject, Inj
 import { GetUsersParamDTO } from "../dto/get-users-param.dto";
 import { UserEntity } from "../user.entity";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { DataSource, Repository } from "typeorm";
 import { CreateUserDTO } from "../dto/create-user.dto";
 import { AuthService } from "src/auth/providers/auth.service";
 import { ConfigService, ConfigType } from "@nestjs/config";
 import profileConfig from "src/config/profile.config";
 import { error } from "console";
+import { UsersCreateManyProvider } from "./users-create-many.provider";
+import { createManyUsersDto } from "../dto/create-many-users.dto";
 
 /**
  *  Class to connect  to Users table and perform business operations
@@ -21,21 +23,24 @@ export class UsersService{
 
 
     constructor(
-        /**
-         * Injecting usersRepository
-         */ 
-          @InjectRepository(UserEntity)
-          private usersRepository:Repository<UserEntity>,
+        /*
+        * Injecting usersRepository
+        */ 
+        @InjectRepository(UserEntity)
+        private usersRepository:Repository<UserEntity>,
 
-          // Injecting Auth Service
-          @Inject(forwardRef(()=>AuthService))
-          private readonly authService:AuthService,
+        // Injecting Auth Service
+        @Inject(forwardRef(()=>AuthService))
+        private readonly authService:AuthService,
 
-        //   have acces to profile api key
-          @Inject(profileConfig.KEY)
-          private readonly profileConfiguration:ConfigType<typeof profileConfig>
-
-        ){}
+        //  have acces to profile api key
+        @Inject(profileConfig.KEY)
+        private readonly profileConfiguration:ConfigType<typeof profileConfig>,
+        /*
+        * Injecting usersCreateManyProvider
+        */ 
+        private readonly usersCreateManyProvider:UsersCreateManyProvider,
+    ){}
 
     public async createUser(createUserDTO:CreateUserDTO){
         // check if users exists with the same email
@@ -104,5 +109,9 @@ export class UsersService{
             throw new BadRequestException("the user id does not exist");
         }
        return await this.usersRepository.findOneBy({id});
+    }
+
+    public async createMany(createManyUsersDto:createManyUsersDto){
+      return await this.usersCreateManyProvider.createMany(createManyUsersDto);
     }
 }
