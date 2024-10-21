@@ -11,7 +11,11 @@ async function bootstrap() {
     // throws back the req as error if some property is not on DTO
     forbidNonWhitelisted:true,
     // transform an incoming proocess iinto a instanceof DTO class after validation
-    transform:true
+    transform:true,
+    // to do the implicit conversion when needed for the values in dto, for not using @Type for them
+    transformOptions:{
+      enableImplicitConversion:true
+    }
   }));
 
 // swagger configuration
