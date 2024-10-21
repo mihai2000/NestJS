@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, RequestTimeoutException } from '@nestjs/common';
 import { UsersService } from 'src/users/providers/users.service';
 import { Repository } from 'typeorm';
 import { PostEntity } from '../post.entity';
@@ -58,17 +58,45 @@ export class PostsService {
   
   public async update(updatePostDto: UpdatePostDTO) {
     // Find new tags
-    let tags = await this.tagsService.findMultipleTags(updatePostDto.tags);
-    
-    // Update the post
-    let post = await this.postsRepository.findOneBy({
-      id: updatePostDto.id,
-    });
-    
+    let tags = undefined
+    let post = undefined
+    try {
+      tags = await this.tagsService.findMultipleTags(updatePostDto.tags);
+    } catch (error) {
+      throw new RequestTimeoutException('Unable to porocess your req at the moment, try later', {
+        description:"Error connecting to the database",
+    })
+    }
+
+    try {
+      // Update the post
+      post = await this.postsRepository.findOneBy({
+        id: updatePostDto.id,
+      });
+    } catch (error) {
+      throw new RequestTimeoutException('Unable to porocess your req at the moment, try later', {
+        description:"Error connecting to the database",
+    })
+    }
+
+    if (!post){
+    throw new BadRequestException("the post d does not exit")
+    }
+    if (!tags || tags.length !== updatePostDto.tags.length){
+    throw new BadRequestException("please check yout tag IDs and ensure they are correct")
+    }
+  
     // Update the tags
     post.tags = tags;
     
-    return await this.postsRepository.save(post);
+     try {
+      await this.postsRepository.save(post);
+     } catch (error) {
+      throw new RequestTimeoutException('Unable to porocess your req at the moment, try later', {
+        description:"Error connecting to the database",
+    })  
+     }
+    return post;
   }
 
   /**
