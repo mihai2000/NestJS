@@ -6,10 +6,11 @@ import { DataSource, Repository } from "typeorm";
 import { CreateUserDTO } from "../dto/create-user.dto";
 import { AuthService } from "src/auth/providers/auth.service";
 import { ConfigService, ConfigType } from "@nestjs/config";
-import profileConfig from "src/config/profile.config";
-import { error } from "console";
 import { UsersCreateManyProvider } from "./users-create-many.provider";
 import { createManyUsersDto } from "../dto/create-many-users.dto";
+import { CreateUserService } from "./create-user.service";
+import { FindOneUserByEmailService } from "./find-one-user-by-email.service";
+import profileConfig from "../config/profile.config";
 
 /**
  *  Class to connect  to Users table and perform business operations
@@ -40,37 +41,20 @@ export class UsersService{
         * Injecting usersCreateManyProvider
         */ 
         private readonly usersCreateManyProvider:UsersCreateManyProvider,
+
+         /*
+         Inject createUserService
+        */
+        private readonly createUserServive:CreateUserService,
+         /*
+         Inject findOneUserByEmailService
+        */
+        private readonly findOneUserByEmailService:FindOneUserByEmailService
     ){}
 
     public async createUser(createUserDTO:CreateUserDTO){
-        // check if users exists with the same email
-       let existingUser = undefined;
-        try {
-         existingUser = await this.usersRepository.findOne({
-            where:{email:createUserDTO.email}
-            });
-       } catch (error) {
-        throw new RequestTimeoutException('Unable to porocess your req at the moment, try later', {
-            description:"Error connecting to the database",
-        })
-       }
-        // handle exceptions
-        if(existingUser){
-            throw new BadRequestException("The User already exists, please check ypur email");
-        }
-        // if user doesn't exist create a user
-        let newUser = this.usersRepository.create(createUserDTO);
-
-        try {
-            newUser = await this.usersRepository.save(newUser);
-        } catch (error) {
-            throw new RequestTimeoutException('Unable to porocess your req at the moment, try later', {
-                description:"Error connecting to the database",
-            })
-        }
-        return newUser;
+      return this.createUserServive.createUser(createUserDTO)
     }
-
 
     public findAll(
         getUsersParamDTO:GetUsersParamDTO,
@@ -113,5 +97,9 @@ export class UsersService{
 
     public async createMany(createManyUsersDto:createManyUsersDto){
       return await this.usersCreateManyProvider.createMany(createManyUsersDto);
+    }
+
+    public async findOneByEmail(email:string){
+        return this.findOneUserByEmailService.findOneByEmail(email);
     }
 }
