@@ -35,7 +35,7 @@ export class CreateUserService {
        }
         // handle exceptions
         if(existingUser){
-            throw new BadRequestException("The User already exists, please check ypur email");
+            throw new BadRequestException("The User already exists, please check your email");
         }
         // if user doesn't exist create a user
         let newUser = this.usersRepository.create({

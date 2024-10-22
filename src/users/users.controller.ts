@@ -1,4 +1,4 @@
-import { Controller,Get,Post, Patch,Put,Delete, Param,Query,Body,Req,Headers,Ip,ParseIntPipe,DefaultValuePipe,ValidationPipe } from '@nestjs/common';
+import { Controller,Get,Post, Patch,Put,Delete, Param,Query,Body,Req,Headers,Ip,ParseIntPipe,DefaultValuePipe,ValidationPipe, UseGuards, SetMetadata } from '@nestjs/common';
 import { Request } from '@nestjs/common';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { GetUsersParamDTO } from './dto/get-users-param.dto';
@@ -6,6 +6,9 @@ import { UpdateUserDTO } from './dto/update-user.dto';
 import { UsersService } from './providers/users.service';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { createManyUsersDto } from './dto/create-many-users.dto';
+import { AccessTokenGuard } from 'src/auth/guards/access-token/access-token.guard';
+import { Auth } from 'src/auth/decorators/auth.decorator';
+import { AuthTypeEnum } from 'src/auth/enums/auth-type.enum';
 
 @Controller('users')
 @ApiTags('Users')
@@ -50,10 +53,13 @@ export class UsersController {
     }
 
     @Post()
+    // @SetMetadata('authType', 'None')
+    // if both bearere and none is assinged the controller becomes public 
+    @Auth(AuthTypeEnum.None)
     public createUsers(@Body() createUserDTO:CreateUserDTO){
         return this.usersService.createUser(createUserDTO);
     }
-   
+
     @Post('create-many')
     public createManyUsers(@Body() createManyUsersDto:createManyUsersDto){
         return this.usersService.createMany(createManyUsersDto);
