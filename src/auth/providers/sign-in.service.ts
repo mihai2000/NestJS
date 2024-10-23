@@ -2,10 +2,7 @@ import { forwardRef, Inject, Injectable, RequestTimeoutException, UnauthorizedEx
 import { SignInDto } from '../dto/signin.dto';
 import { UsersService } from 'src/users/providers/users.service';
 import { HashingService } from './hashing.service';
-import { JwtService } from '@nestjs/jwt';
-import { ConfigType } from '@nestjs/config';
-import jwtConfig from '../config/jwt.config';
-import { ActiveUserData } from '../interfaces/active-user-data.interface';
+import { GenerateTokensService } from './generate-tokens.service';
 
 @Injectable()
 export class SignInService {
@@ -15,10 +12,8 @@ export class SignInService {
         
         private readonly hashingService:HashingService,
 
-        private readonly jwtService:JwtService,
+        private readonly  generateTokensService:GenerateTokensService  //generate both access and refresh tokens
 
-        @Inject(jwtConfig.KEY)
-        private readonly jwtConfiguration:ConfigType<typeof jwtConfig>
     ){}
 
     public async signIn(signInDto:SignInDto){
@@ -42,19 +37,6 @@ export class SignInService {
         }
         // Send Confirmation
         // this is for JWT Token
-        const accessToken = await this.jwtService.signAsync({
-            sub:user.id,
-            email:user.email
-        } as ActiveUserData,
-        {
-            audience:this.jwtConfiguration.audience,
-            issuer:this.jwtConfiguration.issuer,
-            secret:this.jwtConfiguration.secret,
-            expiresIn:this.jwtConfiguration.accessTokenTtl,
-        });
-        
-        return {
-            accessToken
-        }
+        return await this.generateTokensService.generateTokens(user)
     }
 }
