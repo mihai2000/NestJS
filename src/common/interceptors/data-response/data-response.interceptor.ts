@@ -1,0 +1,17 @@
+import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Observable, tap, map } from 'rxjs';
+
+@Injectable()
+export class DataResponseInterceptor implements NestInterceptor {
+  constructor(private readonly configService:ConfigService){}
+intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+  // taps into the data so it gives to acces to this data object
+  return next.handle().pipe(
+      map((data) => ({
+        apiVersion:this.configService.get('appConfig.apiVersion'),
+        data:data,
+      })),
+    );
+  }
+}

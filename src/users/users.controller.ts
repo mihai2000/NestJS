@@ -1,4 +1,4 @@
-import { Controller,Get,Post, Patch,Put,Delete, Param,Query,Body,Req,Headers,Ip,ParseIntPipe,DefaultValuePipe,ValidationPipe, UseGuards, SetMetadata } from '@nestjs/common';
+import { Controller,Get,Post, Patch,Put,Delete, Param,Query,Body,Req,Headers,Ip,ParseIntPipe,DefaultValuePipe,ValidationPipe, UseGuards, SetMetadata, UseInterceptors, ClassSerializerInterceptor } from '@nestjs/common';
 import { Request } from '@nestjs/common';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { GetUsersParamDTO } from './dto/get-users-param.dto';
@@ -56,6 +56,7 @@ export class UsersController {
     // @SetMetadata('authType', 'None')
     // if both bearere and none is assinged the controller becomes public 
     @Auth(AuthTypeEnum.None)
+    @UseInterceptors(ClassSerializerInterceptor)
     public createUsers(@Body() createUserDTO:CreateUserDTO){
         return this.usersService.createUser(createUserDTO);
     }
