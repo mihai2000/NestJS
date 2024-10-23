@@ -20,9 +20,9 @@ export class AuthenticationGuard implements CanActivate {
     private readonly reflrector:Reflector,
     private readonly accessTokenGuard:AccessTokenGuard
   ){}
-  canActivate(
+  async canActivate(
     context: ExecutionContext,
-  ): boolean | Promise<boolean> | Observable<boolean> {
+  ):  Promise<boolean> {
     // authTypes from reflector 
     const authTypes = this.reflrector.getAllAndOverride(
       AUTH_TYPE_KEY,
@@ -38,7 +38,17 @@ export class AuthenticationGuard implements CanActivate {
       // Default error when user is not authorised
       const error =new UnauthorizedException();
 
-    // loop throw  guards, ifnd canActivate on each instances
-    return true;
-  }
+      // loop throw  guards, ifnd canActivate on each instances
+      for(const instance of guards){
+        const canActivate =await  Promise.resolve(
+          instance.canActivate(context)
+        ).catch((err)=>{
+          error:err;
+        });
+        if(canActivate){
+          return true;
+        }
+      }
+    throw error; 
+ }
 }

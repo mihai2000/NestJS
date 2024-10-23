@@ -119,12 +119,4 @@ tags?:number[];
 @Type (()=>CreatePostMetaOptionsDTO)
 metaOptions?:CreatePostMetaOptionsDTO | null;
 
-@ApiProperty({
-    type:'integer',
-    required:true,
-    example:1
-})
-@IsNotEmpty()
-@IsInt()
-authorId:number;
 }

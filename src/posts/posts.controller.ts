@@ -14,6 +14,8 @@ import {
   import { CreatePostDTO } from './dto/create-post.dto';
 import { UpdatePostDTO } from './dto/update-posts.dto';
 import { GetPostsDto } from './dto/get-posts.dto';
+import { ActiveUser } from 'src/auth/decorators/active-user.decorator';
+import { ActiveUserData } from 'src/auth/interfaces/active-user-data.interface';
   
   @Controller('posts')
   @ApiTags('Posts')
@@ -41,8 +43,8 @@ import { GetPostsDto } from './dto/get-posts.dto';
       description: 'You get a 201 response if your post is created successfully',
     })
     @Post()
-    public createPost(@Body() CreatePostDTO: CreatePostDTO) {
-      return this.postsService.create(CreatePostDTO);
+    public createPost(@Body() CreatePostDTO: CreatePostDTO, @ActiveUser() user:ActiveUserData) {
+      return this.postsService.create(CreatePostDTO,user);
     }
   
     @ApiOperation({

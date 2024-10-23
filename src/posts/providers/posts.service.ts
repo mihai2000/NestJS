@@ -9,6 +9,8 @@ import { UpdatePostDTO } from '../dto/update-posts.dto';
 import { GetPostsDto } from '../dto/get-posts.dto';
 import { PaginationProvider } from 'src/common/pagination/providers/pagination.service';
 import { Paginated } from 'src/common/pagination/interfaces/paginated.interface';
+import { CreatePostService } from './create-post.service';
+import { ActiveUserData } from 'src/auth/interfaces/active-user-data.interface';
 
 @Injectable()
 export class PostsService {
@@ -29,25 +31,16 @@ export class PostsService {
     /*
     Injecting pagination provider
     */
-   private  readonly paginationService:PaginationProvider
+   private  readonly paginationService:PaginationProvider,
+
+   private readonly createPostService:CreatePostService
   ) {}
 
   /**
    * Method to create a new post
    */
-  public async create(createPostDto: CreatePostDTO) {
-
-    let author = await this.usersService.findOneById(createPostDto.authorId);
-
-    let tags = await this.tagsService.findMultipleTags(createPostDto.tags);
-    // Create the post
-    let post = this.postsRepository.create({
-      ...createPostDto,
-      author: author,
-      tags:tags,
-    });
-
-    return await this.postsRepository.save(post);
+  public async create(createPostDto: CreatePostDTO, user:ActiveUserData) {
+    return await this.createPostService.create(createPostDto,user)
   }
 
   public async findAll(postQuery:GetPostsDto, userId: string):Promise<Paginated<PostEntity>> {
