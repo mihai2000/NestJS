@@ -1,4 +1,4 @@
-export enum AuthTypeEnum{
-    Bearer,
-    None
+export enum AuthTypeEnum {
+  Bearer,
+  None,
 }

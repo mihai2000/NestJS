@@ -20,7 +20,6 @@ import { AccessTokenGuard } from 'src/auth/guards/access-token/access-token.guar
 import { AuthenticationGuard } from 'src/auth/guards/authentication/authentication.guard';
 import { DataResponseInterceptor } from 'src/common/interceptors/data-response/data-response.interceptor';
 
-
 const ENV = process.env.NODE_ENV;
 
 @Module({
@@ -48,24 +47,25 @@ const ENV = process.env.NODE_ENV;
         database: configService.get('database.name'),
       }),
     }),
-    ConfigModule.forFeature(jwtConfig), 
+    ConfigModule.forFeature(jwtConfig),
     JwtModule.registerAsync(jwtConfig.asProvider()),
     TagsModule,
     MetaOptionsModule,
     PaginationModule,
   ],
   controllers: [AppController],
-  providers: [AppService,
-     // implement acces token guard to the entire modules exitent
-     {
-      provide:APP_GUARD,
-      useClass:AuthenticationGuard
-  },
-  {
-    provide:APP_INTERCEPTOR,
-    useClass:DataResponseInterceptor
-  },
-  AccessTokenGuard
+  providers: [
+    AppService,
+    // implement acces token guard to the entire modules exitent
+    {
+      provide: APP_GUARD,
+      useClass: AuthenticationGuard,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: DataResponseInterceptor,
+    },
+    AccessTokenGuard,
   ],
 })
 export class AppModule {}
