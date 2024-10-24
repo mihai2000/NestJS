@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, RequestTimeoutException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  RequestTimeoutException,
+} from '@nestjs/common';
 import { UsersService } from 'src/users/providers/users.service';
 import { Repository } from 'typeorm';
 import { PostEntity } from '../post.entity';
@@ -31,39 +35,46 @@ export class PostsService {
     /*
     Injecting pagination provider
     */
-   private  readonly paginationService:PaginationProvider,
+    private readonly paginationService: PaginationProvider,
 
-   private readonly createPostService:CreatePostService
+    private readonly createPostService: CreatePostService,
   ) {}
 
   /**
    * Method to create a new post
    */
-  public async create(createPostDto: CreatePostDTO, user:ActiveUserData) {
-    return await this.createPostService.create(createPostDto,user)
+  public async create(createPostDto: CreatePostDTO, user: ActiveUserData) {
+    return await this.createPostService.create(createPostDto, user);
   }
 
-  public async findAll(postQuery:GetPostsDto, userId: string):Promise<Paginated<PostEntity>> {
-   let posts = await this.paginationService.paginateQuery({
-    limit:postQuery.limit,
-    page:postQuery.page
-   },
-  this.postsRepository)
-  //  let posts = await this.postsRepository.find({});  //with eager, to not get all the realtions where eager is true is defined
-  return posts;
+  public async findAll(
+    postQuery: GetPostsDto,
+    userId: string,
+  ): Promise<Paginated<PostEntity>> {
+    const posts = await this.paginationService.paginateQuery(
+      {
+        limit: postQuery.limit,
+        page: postQuery.page,
+      },
+      this.postsRepository,
+    );
+    //  let posts = await this.postsRepository.find({});  //with eager, to not get all the realtions where eager is true is defined
+    return posts;
   }
 
-  
   public async update(updatePostDto: UpdatePostDTO) {
     // Find new tags
-    let tags = undefined
-    let post = undefined
+    let tags = undefined;
+    let post = undefined;
     try {
       tags = await this.tagsService.findMultipleTags(updatePostDto.tags);
     } catch (error) {
-      throw new RequestTimeoutException('Unable to porocess your req at the moment, try later', {
-        description:"Error connecting to the database",
-    })
+      throw new RequestTimeoutException(
+        'Unable to porocess your req at the moment, try later',
+        {
+          description: 'Error connecting to the database',
+        },
+      );
     }
 
     try {
@@ -72,28 +83,36 @@ export class PostsService {
         id: updatePostDto.id,
       });
     } catch (error) {
-      throw new RequestTimeoutException('Unable to porocess your req at the moment, try later', {
-        description:"Error connecting to the database",
-    })
+      throw new RequestTimeoutException(
+        'Unable to porocess your req at the moment, try later',
+        {
+          description: 'Error connecting to the database',
+        },
+      );
     }
 
-    if (!post){
-    throw new BadRequestException("the post d does not exit")
+    if (!post) {
+      throw new BadRequestException('the post d does not exit');
     }
-    if (!tags || tags.length !== updatePostDto.tags.length){
-    throw new BadRequestException("please check yout tag IDs and ensure they are correct")
+    if (!tags || tags.length !== updatePostDto.tags.length) {
+      throw new BadRequestException(
+        'please check yout tag IDs and ensure they are correct',
+      );
     }
-  
+
     // Update the tags
     post.tags = tags;
-    
-     try {
+
+    try {
       await this.postsRepository.save(post);
-     } catch (error) {
-      throw new RequestTimeoutException('Unable to porocess your req at the moment, try later', {
-        description:"Error connecting to the database",
-    })  
-     }
+    } catch (error) {
+      throw new RequestTimeoutException(
+        'Unable to porocess your req at the moment, try later',
+        {
+          description: 'Error connecting to the database',
+        },
+      );
+    }
     return post;
   }
 
@@ -105,4 +124,4 @@ export class PostsService {
     await this.postsRepository.delete(id);
     return { deleted: true, id };
   }
-} 
+}

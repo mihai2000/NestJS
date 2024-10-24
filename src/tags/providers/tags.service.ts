@@ -15,18 +15,18 @@ export class TagsService {
   ) {}
 
   public async create(createTagDto: CreateTagDto) {
-    let tag = this.tagsRepository.create(createTagDto);
+    const tag = this.tagsRepository.create(createTagDto);
     return await this.tagsRepository.save(tag);
   }
 
-  public async findMultipleTags(tags:number[]){
-    let results = await this.tagsRepository.find({
-      where:{
+  public async findMultipleTags(tags: number[]) {
+    const results = await this.tagsRepository.find({
+      where: {
         // take array of ids an find all the tags that have ids within this array
-        id: In(tags)
-      }
-    })
-  return results;
+        id: In(tags),
+      },
+    });
+    return results;
   }
 
   public async delete(id: number) {
@@ -37,7 +37,7 @@ export class TagsService {
       id,
     };
   }
-  
+
   public async softRemove(id: number) {
     await this.tagsRepository.softDelete(id);
 

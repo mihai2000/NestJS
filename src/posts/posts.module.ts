@@ -12,7 +12,11 @@ import { CreatePostService } from './providers/create-post.service';
 @Module({
   controllers: [PostsController],
   providers: [PostsService, CreatePostService],
-  imports: [UsersModule, TypeOrmModule.forFeature([PostEntity, UserEntity]),TagsModule, PaginationModule],
-
+  imports: [
+    UsersModule,
+    TypeOrmModule.forFeature([PostEntity, UserEntity]),
+    TagsModule,
+    PaginationModule,
+  ],
 })
 export class PostsModule {}
