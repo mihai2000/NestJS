@@ -41,6 +41,3 @@ async function bootstrap() {
   await app.listen(3000);
 }
 bootstrap();
-
-// client ID :222519828765-48r1uh0uva1a7tene6ttfjtqgsclobvs.apps.googleusercontent.com
-// client Secret: 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
