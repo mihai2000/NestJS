@@ -1,21 +1,19 @@
 import { Global, Module } from '@nestjs/common';
+
+import { ConfigService } from '@nestjs/config';
+import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter';
 import { MailService } from './providers/mail.service';
 import { MailerModule } from '@nestjs-modules/mailer';
-import { ConfigService } from '@nestjs/config';
 import { join } from 'path';
-import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter';
-import { strict } from 'assert';
+
 @Global()
 @Module({
-  providers: [MailService],
-  exports: [MailService],
   imports: [
     MailerModule.forRootAsync(
       {
-        inject: [ConfigService],
         useFactory: async (config: ConfigService) => ({
           transport: {
-            hostname: config.get('appConfig.mailHost'),
+            host: config.get('appConfig.mailHost'),
             secure: false,
             port: 2525,
             auth: {
@@ -28,12 +26,17 @@ import { strict } from 'assert';
           },
           template: {
             dir: join(__dirname, 'templates'),
-            adapter: new EjsAdapter(),
-            options: { strict: false}
-          }
-        })
+            adapter: new EjsAdapter({ inlineCssEnabled: true }),
+            options: {
+              strict: false,
+            },
+          },
+        }),
+        inject: [ConfigService],
       }
-    )
-  ]
+    ),
+  ],
+  providers: [MailService],
+  exports: [MailService],
 })
 export class MailModule { }
