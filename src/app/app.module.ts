@@ -40,7 +40,7 @@ const ENV = process.env.NODE_ENV;
       useFactory: async (configService: ConfigService) => ({
         type: 'postgres',
         synchronize: configService.get('database.synchronize'),
-        port: configService.get('database.port'),
+        port: +configService.get('database.port'),
         username: configService.get('database.user'),
         password: configService.get('database.password'),
         host: configService.get('database.host'),

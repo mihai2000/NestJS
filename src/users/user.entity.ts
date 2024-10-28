@@ -41,6 +41,7 @@ export class UserEntity {
     type: 'varchar',
     nullable: true,
   })
+  @Exclude()
   googleId?: string;
 
   @OneToMany(() => PostEntity, (post) => post.author)

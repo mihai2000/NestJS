@@ -66,8 +66,8 @@ export class UsersController {
   @Post()
   // @SetMetadata('authType', 'None')
   // if both bearere and none is assinged the controller becomes public
-  @Auth(AuthTypeEnum.None)
   @UseInterceptors(ClassSerializerInterceptor)
+  @Auth(AuthTypeEnum.None)
   public createUsers(@Body() createUserDTO: CreateUserDTO) {
     return this.usersService.createUser(createUserDTO);
   }
