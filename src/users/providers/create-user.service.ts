@@ -10,6 +10,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from '../user.entity';
 import { Repository } from 'typeorm';
 import { HashingService } from 'src/auth/providers/hashing.service';
+import { MailService } from 'src/mail/providers/mail.service';
 
 @Injectable()
 export class CreateUserService {
@@ -25,7 +26,9 @@ export class CreateUserService {
      */
     @Inject(forwardRef(() => HashingService))
     private readonly hashingService: HashingService,
-  ) {}
+
+    private readonly mailService: MailService
+  ) { }
 
   public async createUser(createUserDTO: CreateUserDTO) {
     // check if users exists with the same email
@@ -63,6 +66,11 @@ export class CreateUserService {
           description: 'Error connecting to the database',
         },
       );
+    }
+    try {
+      await this.mailService.sendUserWelcome(newUser);
+    } catch (error) {
+      throw new RequestTimeoutException(error)
     }
     return newUser;
   }
