@@ -1,9 +1,7 @@
 import {
   BadRequestException,
-  forwardRef,
   HttpException,
   HttpStatus,
-  Inject,
   Injectable,
   RequestTimeoutException,
 } from '@nestjs/common';
@@ -12,13 +10,10 @@ import { UserEntity } from '../user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUserDTO } from '../dto/create-user.dto';
-import { AuthService } from 'src/auth/providers/auth.service';
-import { ConfigType } from '@nestjs/config';
 import { UsersCreateManyProvider } from './users-create-many.provider';
 import { createManyUsersDto } from '../dto/create-many-users.dto';
 import { CreateUserService } from './create-user.service';
 import { FindOneUserByEmailService } from './find-one-user-by-email.service';
-import profileConfig from '../config/profile.config';
 import { FindOneByGoogleIdService } from './find-one-by-google-id.service';
 import { CreateGoogleUserService } from './create-google-user.service';
 import { GoogleUser } from '../interfaces/google-user.interface';
@@ -40,13 +35,6 @@ export class UsersService {
     @InjectRepository(UserEntity)
     private usersRepository: Repository<UserEntity>,
 
-    // Injecting Auth Service
-    @Inject(forwardRef(() => AuthService))
-    private readonly authService: AuthService,
-
-    //  have acces to profile api key
-    @Inject(profileConfig.KEY)
-    private readonly profileConfiguration: ConfigType<typeof profileConfig>,
     /*
      * Injecting usersCreateManyProvider
      */

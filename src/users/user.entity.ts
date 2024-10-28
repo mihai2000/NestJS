@@ -41,8 +41,8 @@ export class UserEntity {
     type: 'varchar',
     nullable: true,
   })
-  googleId: string;
+  googleId?: string;
 
   @OneToMany(() => PostEntity, (post) => post.author)
-  posts: PostEntity[];
+  posts?: PostEntity[];
 }
